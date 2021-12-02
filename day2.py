@@ -1,44 +1,32 @@
-commands = list(map(lambda l: l.strip(), open('input2.txt').readlines()))
+lines = [l.strip() for l in open('input2.txt').readlines()]
+pairs = [l.split(' ') for l in lines]
+commands = [(p[0], int(p[1])) for p in pairs]
+
 
 def part1(commands):
-    horizontal_position = 0
-    depth = 0
-
-    for command in commands:
-        command_name, amount = command.split(' ')
-        amount = int(amount)
-
-        if command_name == 'forward':
-            horizontal_position += amount
-        
-        if command_name == 'down':
-            depth += amount
-        
-        if command_name == 'up':
-            depth -= amount
+    horizontal_position = sum(a for c, a in commands if c == 'forward')
+    depth = sum(a for c, a in commands if c == 'down')
+    depth -= sum(a for c, a in commands if c == 'up')
 
     return horizontal_position * depth
 
+
 def part2(commands):
-    horizontal_position = 0
-    depth = 0
-    aim = 0
+    horizontal_position = depth = aim = 0
 
-    for command in commands:
-        command_name, amount = command.split(' ')
-        amount = int(amount)
-
-        if command_name == 'forward':
+    for command, amount in commands:
+        if command == 'forward':
             horizontal_position += amount
             depth += aim * amount
         
-        if command_name == 'down':
+        if command == 'down':
             aim += amount
         
-        if command_name == 'up':
+        if command == 'up':
             aim -= amount
 
     return horizontal_position * depth
+
 
 print("Day 2 part 1:", part1(commands))
 print("Day 2 part 2:", part2(commands))
