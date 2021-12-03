@@ -1,9 +1,9 @@
 lines = list(open('input3.txt').readlines())
 
-from collections import defaultdict, Counter
+from collections import Counter
 
 def part1(lines):
-    counts = defaultdict(int)
+    counts = Counter()
 
     for line in lines:
         for digitIndex, digit in enumerate(line):
@@ -12,64 +12,53 @@ def part1(lines):
             if digit == '1':
                 counts[digitIndex] += 1
 
-    gamma = ""
-    epsilon = ""
-
-    for digitIndex in counts:
-        count = counts[digitIndex]
-        if count > 0:
-            gamma += '1'
-            epsilon += '0'
-        else:
-            gamma += '0'
-            epsilon += '1'
-
+    gamma = ''.join('1' if count > 0 else '0' for count in counts.values())
+    epsilon = ''.join('0' if count > 0 else '1' for count in counts.values())
+    
     gamma = int(gamma, 2)
     epsilon = int(epsilon, 2)
 
     return gamma * epsilon
 
+part1_answer = part1(lines)
 
-print("Day 3 part 1:", part1(lines))
+assert part1_answer == 4147524
+
+print("Day 3 part 1:", part1_answer)
 
 def find_most_common_at_index(lines, index, on_draw):
     at_index = [l[index] for l in lines]
-    result = Counter(at_index).most_common()
+    item_counts = Counter(at_index).most_common()
 
-    if len(result) == 1:
-        most_common = result[0][0]
-    elif result[0][1] == result[1][1]:
-        most_common = on_draw
-    else:
-        most_common = result[0][0]
+    if len(item_counts) > 1 and item_counts[0][1] == item_counts[1][1]:
+        return on_draw
     
-    return most_common
+    return item_counts[0][0]
+
+
+def most_commonality(values, invert=False):
+    index = 0
+    
+    while len(values) != 1:
+        most_common_at_index = find_most_common_at_index(values, index, '1')
+
+        if invert:
+            most_common_at_index = '0' if most_common_at_index == '1' else '1'
+
+        values = [l for l in values if l[index] == most_common_at_index]
+        index += 1
+
+    return values[0]
+
 
 def part2(lines):
-    oxygen = co2 = 0
-
-    oxygen_index = 0
-    oxygen_filtered = lines
-
-    while len(oxygen_filtered) != 1:
-        most_common_at_index = find_most_common_at_index(oxygen_filtered, oxygen_index, '1')
-        oxygen_filtered = [l for l in oxygen_filtered if l[oxygen_index] == most_common_at_index]
-        oxygen_index += 1
-
-    oxygen = int(oxygen_filtered[0], 2)
-    
-    co2_index = 0
-    co2_filtered = lines
-    
-    while len(co2_filtered) != 1:
-        least_common_at_index = '1' if find_most_common_at_index(co2_filtered, co2_index, '1') == '0' else '0'
-
-        co2_filtered = [l for l in co2_filtered if l[co2_index] == least_common_at_index]
-        co2_index += 1
-
-    co2 = int(co2_filtered[0], 2)
+    oxygen = int(most_commonality(lines), 2)
+    co2 = int(most_commonality(lines, invert=True), 2)
 
     return oxygen * co2
 
 
-print("Day 3 part 2:", part2(lines))
+part2_answer = part2(lines)
+assert part2_answer == 3570354
+
+print("Day 3 part 2:", part2_answer)
