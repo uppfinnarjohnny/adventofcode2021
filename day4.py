@@ -16,20 +16,20 @@ for line in board_lines:
 
 boards = list(chunks(board_numbers, 25))
 
-def check_row(board, row_index, drawn):
+def row_is_in_drawn(board, row_index, drawn):
     return all(number in drawn for number in board[row_index * 5:row_index * 5 + 5])
 
-def check_column(board, column_index, drawn):
+def column_is_in_drawn(board, column_index, drawn):
     return all(number in drawn for number in board[column_index:column_index + 25:5])
 
-def check_rows(board, drawn):
-    return any(check_row(board, row_index, drawn) for row_index in range(5))
+def has_row(board, drawn):
+    return any(row_is_in_drawn(board, row_index, drawn) for row_index in range(5))
 
-def check_columns(board, drawn):
-    return any(check_column(board, column_index, drawn) for column_index in range(5))
+def has_column(board, drawn):
+    return any(column_is_in_drawn(board, column_index, drawn) for column_index in range(5))
 
-def check_board(board, drawn):
-    return check_rows(board, drawn) or check_columns(board, drawn)
+def board_scores(board, drawn):
+    return has_row(board, drawn) or has_column(board, drawn)
 
 
 def part1():
@@ -39,7 +39,7 @@ def part1():
         drawn_numbers.append(drawn_number)
 
         for board in boards:
-            if check_board(board, drawn_numbers):
+            if board_scores(board, drawn_numbers):
                 unmarked = [number for number in board if number not in drawn_numbers]
                 score = sum(unmarked) * drawn_number
                 return score
@@ -55,7 +55,7 @@ def part2():
         drawn_numbers.append(drawn_number)
 
         for board_index, board in enumerate(boards_without_wins):
-            if check_board(board, drawn_numbers):
+            if board_scores(board, drawn_numbers):
                 unmarked = [number for number in board if number not in drawn_numbers]
                 last_winning_board_score = sum(unmarked) * drawn_number
                 del boards_without_wins[board_index]
