@@ -1,4 +1,4 @@
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, Counter
 
 Line = namedtuple('Line', ['start', 'end'])
 Point = namedtuple('Point', ['x', 'y'])
@@ -16,7 +16,7 @@ def ints_from_to(start, end):
     return range(start, end, step)
 
 
-def get_intermediary_points(line, include_diagonal=False):
+def points_in_line(line, include_diagonal=False):
     delta_x = line.start.x - line.end.x
     delta_y = line.start.y - line.end.y
 
@@ -26,23 +26,21 @@ def get_intermediary_points(line, include_diagonal=False):
     if delta_y == 0:
         return [Point(x, line.start.y) for x in ints_from_to(line.start.x, line.end.x)]
 
-    if abs(delta_x) == abs(delta_y):
-        if include_diagonal:
-            return [Point(x, y) for x, y in zip(ints_from_to(line.start.x, line.end.x), ints_from_to(line.start.y, line.end.y))]
+    if include_diagonal and abs(delta_x) == abs(delta_y):
+        return [Point(x, y) for x, y in zip(ints_from_to(line.start.x, line.end.x), ints_from_to(line.start.y, line.end.y))]
 
     return []
 
-lines = [parse_line(l) for l in open('input5.txt').readlines()]
 
 def count_overlapping_points(lines, include_diagonals=False):
-    point_counts = defaultdict(int)
-    
+    point_counts = Counter()
+
     for line in lines:
-        for point in get_intermediary_points(line, include_diagonals):
-            point_counts[point] += 1
+        point_counts.update(points_in_line(line, include_diagonals))
 
     return len(list(point for point, count in point_counts.items() if count > 1))
 
 
+lines = [parse_line(l) for l in open('input5.txt').readlines()]
 print('Day 5 part 1:', count_overlapping_points(lines))
 print('Day 5 part 2:', count_overlapping_points(lines, include_diagonals=True))
