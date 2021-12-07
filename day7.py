@@ -1,8 +1,7 @@
 submarine_positions = [int(l) for l in open('input7.txt').read().split(',')]
 
 def part2_fuel(distance):
-    return sum(range(distance + 1))
-
+    return distance * (distance + 1) / 2
 
 def fuel_consumption_for_positions(positions, new_position):
     return sum(abs(p - new_position) for p in positions)
